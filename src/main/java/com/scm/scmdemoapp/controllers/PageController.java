@@ -1,15 +1,23 @@
 package com.scm.scmdemoapp.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.scm.scmdemoapp.entities.User;
 import com.scm.scmdemoapp.forms.UserForm;
+import com.scm.scmdemoapp.services.UserService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class PageController {
+@Autowired
+    private UserService userService;
+
     @RequestMapping("/home")
     public String home(Model model){
             System.out.println("Home page controller");
@@ -39,14 +47,37 @@ public class PageController {
         return "register";
     }
     @RequestMapping(value = "/do-register", method= RequestMethod.POST)
-    public String processRegister(@ModelAttribute UserForm userForm){
+    public String processRegister(@ModelAttribute UserForm userForm, HttpSession session){
         System.out.println("Register");
         // fetch form data
         // User form
         System.out.println(userForm);
         // validate form data
         // save to database
+
+        // converted userForm data to user. data fetched from userForm and filled in user property
+
+
+        // User user = User.builder()
+        // .name(userForm.getName())
+        // .email(userForm.getEmail())
+        // .password(userForm.getPassword())
+        // .phoneNumber(userForm.getPhoneNumber())
+        // .about(userForm.getAbout())
+        // .profile("https://media.istockphoto.com/id/619400810/photo/mr-who.jpg?s=2048x2048&w=is&k=20&c=ajUh75eNfNRDL0M0pcCOfq82dlak8mKavlAKgNbMgl4=")
+        // .build();
+
+        User user = new User();
+        user.setName(userForm.getName());
+        user.setEmail(userForm.getEmail());
+        user.setPassword(userForm.getPassword());
+        user.setPhoneNumber(userForm.getPhoneNumber());
+        user.setAbout(userForm.getAbout());
+        user.setProfile("https://media.istockphoto.com/id/619400810/photo/mr-who.jpg?s=2048x2048&w=ik=20c=ajUh75eNfNRDL0M0pcCOfq82dlak8mKavlAKgNbMgl4=");
+        User savedUser = userService.saveUser(user);
+        System.out.println(savedUser);
         // message="Registration Successfull"
+        session.setAttribute("message", "Registration Successful");
         // redirected to login page
         return "redirect:/register";
     }
